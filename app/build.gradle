@@ -69,6 +69,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.fragment:fragment-ktx:1.2.4"
 
+    //compose
+    implementation "androidx.ui:ui-layout:$compose_version"
+    implementation "androidx.ui:ui-material:$compose_version"
+    implementation "androidx.ui:ui-tooling:$compose_version"
+
+
     // https://github.com/mannodermaus/android-junit5
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
