@@ -1,41 +1,95 @@
 package com.abdelrahman.counterapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.Composable
 import androidx.lifecycle.Observer
-import com.abdelrahman.counterapp.CounterViewEvent.*
-import com.abdelrahman.counterapp.databinding.ActivityCounterBinding
-import com.google.android.material.snackbar.Snackbar
+import androidx.ui.core.Alignment
+import androidx.ui.core.Modifier
+import androidx.ui.core.setContent
+import androidx.ui.foundation.Text
+import androidx.ui.layout.Arrangement
+import androidx.ui.layout.Column
+import androidx.ui.layout.Row
+import androidx.ui.layout.fillMaxSize
+import androidx.ui.layout.fillMaxWidth
+import androidx.ui.material.Button
+import androidx.ui.material.Divider
+import androidx.ui.material.MaterialTheme
+import androidx.ui.material.Surface
+import androidx.ui.tooling.preview.Preview
+import com.abdelrahman.counterapp.CounterViewEvent.CounterDecrement
+import com.abdelrahman.counterapp.CounterViewEvent.CounterIncrement
+import com.abdelrahman.counterapp.CounterViewEvent.ScreenLoadEvent
 
 class CounterActivity : AppCompatActivity() {
 
     private val model by viewModels<CounterViewModel>()
-    private lateinit var binding: ActivityCounterBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCounterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         model.viewState.observe(this, Observer { state ->
-            binding.tvCounter.text = state.counterText
+            setContent {
+                MaterialTheme {
+                    MyApp {
+                        MyScreenContent(count = state.counterText, model = model)
+                    }
+                }
+            }
         })
-        model.viewEffects.observe(this, EventObserver {
-            Snackbar.make(binding.root, R.string.acticity_main_unable_to_decrement, Snackbar.LENGTH_SHORT)
-                .show()
 
-        })
-        binding.btnPlus.setOnClickListener {
-            model.processEvents(CounterIncrement)
-        }
-        binding.btnMinus.setOnClickListener {
-            model.processEvents(CounterDecrement)
-        }
+//
+//        model.viewEffects.observe(this, EventObserver {
+//            Snackbar.make(this, R.string.acticity_main_unable_to_decrement, Snackbar.LENGTH_SHORT)
+//                .show()
+//        })
     }
 
     override fun onResume() {
         super.onResume()
         model.processEvents(ScreenLoadEvent)
+    }
+}
+
+@Composable
+fun MyApp(content: @Composable() () -> Unit) {
+    Surface() {
+        content()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun myDefaultPreview() {
+    MyApp {
+        MyScreenContent(model = CounterViewModel())
+    }
+}
+
+@Composable
+fun MyScreenContent(count: String = "0", model: CounterViewModel) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            horizontalGravity = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Count: $count")
+        }
+
+        Row {
+            Button(onClick = {
+                model.processEvents(CounterIncrement)
+            }) {
+                Text(text = "+")
+            }
+            Divider(modifier = Modifier.weight(1f).fillMaxWidth())
+            Button(onClick = {
+                model.processEvents(CounterDecrement)
+            }) {
+                Text(text = "-")
+            }
+        }
     }
 }
